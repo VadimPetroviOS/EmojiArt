@@ -18,8 +18,8 @@ class EmojArtDocument: ObservableObject {
     
     init() {
         if let data = try? Data(contentsOf: autosaveURL),
-           let autisavedEmojiArt = try? EmojiArt(json: data) {
-            emojiArt = autisavedEmojiArt
+           let autosavedEmojiArt = try? EmojiArt(json: data) {
+            emojiArt = autosavedEmojiArt
         }
     }
     
