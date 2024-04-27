@@ -7,10 +7,27 @@
 
 import SwiftUI
 
-class PaletteStore: ObservableObject {
+extension UserDefaults {
+    func palettes(forKey key: String) -> [Palette] {
+        if let jsonData = data(forKey: key),
+           let decodedPalettes = try? JSONDecoder().decode([Palette].self, from: jsonData) {
+            return decodedPalettes
+        } else {
+            return []
+        }
+    }
+    func set(_ palettes: [Palette], forKey key: String) {
+        let data = try? JSONEncoder().encode(palettes)
+        set(data, forKey: key)
+    }
+}
+
+class PaletteStore: ObservableObject, Identifiable {
     let name: String
     
-    private var userDefaultsKey: String { "Palettetore:" + name }
+    var id: String { name }
+    
+    private var userDefaultsKey: String { "PaletteStore:" + name }
     
     var palettes: [Palette] {
         get {
@@ -24,12 +41,12 @@ class PaletteStore: ObservableObject {
         }
     }
     
-    init(name: String) {
+    init(named name: String) {
         self.name = name
         if palettes.isEmpty {
             palettes = Palette.builtins
             if palettes.isEmpty {
-                palettes = [Palette(name: "Warning", emojis: "🎟")]
+                palettes = [Palette(name: "Warning", emojis: "⚠️")]
             }
         }
     }
@@ -41,6 +58,7 @@ class PaletteStore: ObservableObject {
         get { boundsCheckedPaletteIndex(_cursorIndex) }
         set { _cursorIndex = boundsCheckedPaletteIndex(newValue) }
     }
+    
     
     private func boundsCheckedPaletteIndex(_ index: Int) -> Int {
         var index = index % palettes.count
@@ -84,18 +102,13 @@ class PaletteStore: ObservableObject {
     }
 }
 
-extension UserDefaults {
-    func set(_ palette: [Palette], forKey key: String) {
-        let data = try? JSONEncoder().encode(palette)
-        set(data, forKey: key)
+extension PaletteStore: Hashable {
+    static func == (lhs: PaletteStore, rhs: PaletteStore) -> Bool {
+        lhs.name == rhs.name
     }
     
-    func palettes(forKey key: String) -> [Palette] {
-        if let jsonData = data(forKey: key),
-           let decodePalettes = try? JSONDecoder().decode([Palette].self, from: jsonData) {
-            return decodePalettes
-        } else {
-            return []
-        }
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(name)
     }
+    
 }

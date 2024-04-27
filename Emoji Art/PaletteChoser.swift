@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct PaletteChoser: View {
+struct PaletteChooser: View {
     @EnvironmentObject
     var store: PaletteStore
     
@@ -15,7 +15,7 @@ struct PaletteChoser: View {
     private var showPaletteEditor = false
     @State
     private var showPaletteList = false
-    
+
     var body: some View {
         HStack {
             chooser
@@ -27,12 +27,14 @@ struct PaletteChoser: View {
                 .font(nil)
         }
         .sheet(isPresented: $showPaletteList) {
-            PaletteList()
-                .font(nil)
+            NavigationStack {
+                EditablePaletteList(store: store)
+                    .font(nil)
+            }
         }
     }
     
-    var chooser: some View {
+    private var chooser: some View {
         AnimatedActionButton(systemImage: "paintpalette") {
             store.cursorIndex += 1
         }
@@ -58,7 +60,7 @@ struct PaletteChoser: View {
         Menu {
             ForEach(store.palettes) { palette in
                 AnimatedActionButton(palette.name) {
-                    if let index = store.palettes.firstIndex(where: $0.id == palette.id ) {
+                    if let index = store.palettes.firstIndex(where: { $0.id == palette.id }) {
                         store.cursorIndex = index
                     }
                 }
@@ -68,7 +70,7 @@ struct PaletteChoser: View {
         }
     }
     
-    func view(for palette: Palette) -> some View {
+    private func view(for palette: Palette) -> some View {
         HStack {
             Text(palette.name)
             ScrollingEmojis(palette.emojis)
@@ -82,7 +84,7 @@ struct ScrollingEmojis: View {
     let emojis: [String]
     
     init(_ emojis: String) {
-        self.emojis = emojis.uniqed.map(String.init)
+        self.emojis = emojis.uniqued.map(String.init)
     }
     
     var body: some View {
@@ -97,9 +99,9 @@ struct ScrollingEmojis: View {
     }
 }
 
-struct PaletteChoser_Previews: PreviewProvider {
+struct PaletteChooser_Previews: PreviewProvider {
     static var previews: some View {
-        PaletteChoser()
-            .environmentObject(PaletteStore(name: "Preview"))
+        PaletteChooser()
+            .environmentObject(PaletteStore(named: "Preview"))
     }
 }

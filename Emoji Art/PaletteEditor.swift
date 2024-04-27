@@ -9,9 +9,12 @@ import SwiftUI
 
 struct PaletteEditor: View {
     @Binding
-    let palette: Palette
-    
+    var palette: Palette
+        
     private let emojiFont = Font.system(size: 40)
+    
+    @State
+    private var emojisToAdd: String = ""
     
     enum Focused {
         case name
@@ -24,7 +27,7 @@ struct PaletteEditor: View {
     var body: some View {
         Form {
             Section(header: Text("Name")) {
-                TextField("Name", text: palette.name)
+                TextField("Name", text: $palette.name)
                     .focused($focused, equals: .name)
             }
             Section(header: Text("Emojis")) {
@@ -39,14 +42,14 @@ struct PaletteEditor: View {
                 removeEmojis
             }
         }
-            .frame(minWidth: 300, minHeight: 350)
-            .onAppear {
-                if palette.name.isEmpty {
-                    focused = .name
-                } else {
-                    focused = .addEmojis
-                }
+        .frame(minWidth: 300, minHeight: 350)
+        .onAppear {
+            if palette.name.isEmpty {
+                focused = .name
+            } else {
+                focused = .addEmojis
             }
+        }
     }
     
     var removeEmojis: some View {
@@ -70,12 +73,12 @@ struct PaletteEditor: View {
 
 struct PaletteEditor_Previews: PreviewProvider {
     struct Preview: View {
-        @State
-        private var palette = PaletteStore(name: "Preview").palettes.first!
+        @State private var palette = PaletteStore(named: "Preview").palettes.first!
         var body: some View {
-            PaletteEditor(palette: palette)
+            PaletteEditor(palette: $palette)
         }
     }
+    
     static var previews: some View {
         Preview()
     }
