@@ -44,4 +44,3 @@ struct PaletteManager_Previews: PreviewProvider {
         PaletteManager(stores: [PaletteStore(named: "Preview1"),PaletteStore(named: "Preview2")])
     }
 }
-

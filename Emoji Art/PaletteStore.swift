@@ -51,8 +51,7 @@ class PaletteStore: ObservableObject, Identifiable {
         }
     }
     
-    @Published
-    private var _cursorIndex = 0
+    @Published private var _cursorIndex = 0
     
     var cursorIndex: Int {
         get { boundsCheckedPaletteIndex(_cursorIndex) }
